@@ -1,31 +1,69 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <vector>
 using namespace std;
 
-string num_to_words(int n) {
-	vector<string> small_nums{ "", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"};
-	vector<string> teens{"", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"};
-	if (n < 20) {
-		return small_nums[n];
-	} else if (n < 100) {
-		return teens[n/10] + small_nums[n%10];
-	} else if (n%100 == 0) {
-		return small_nums[n/100] + "hundred";
-	} else if (n < 1000) {
-		return small_nums[n/100] + "hundredand" + num_to_words(n%100);
-	} else if (n == 1000) {
-		return "onethousand";
-	} else {
-		return "";
+// From GeeksforGeeks
+string add_string(string s1, string s2) {
+	if (s1.length() > s2.length()) {
+		std::swap(s1, s2);
 	}
+	string out = "";
+	int n1 = s1.length();
+	int n2 = s2.length();
+	int diff = n2-n1;
+	int carry = 0;
+	for (int i = n1-1; i >= 0; i--) {
+		int sum = ((s1[i]-'0')+(s2[i+diff]-'0')+carry);
+		out.push_back(sum%10 + '0');
+		carry = sum/10;
+	}
+	for (int i = n2-n1-1; i >= 0; i--) {
+		int sum = ((s2[i]-'0')+carry);
+		out.push_back(sum%10 + '0');
+		carry = sum/10;
+	}
+	if (carry) out.push_back(carry+'0');
+	std::reverse(out.begin(), out.end());
+	return out;
 }
 
-int main() {
-	string out;
-	for (int i = 0; i <= 1000; i++) {
-		out += num_to_words(i);
+string multiply_ten(string s, int n) {
+	string out = s;
+	for (int i = 0; i < n; i++) out += "0";
+	return out;
+}
+
+string multiply_string(string s1, string s2) {
+	vector<string> mult_table;
+	mult_table.push_back("0");
+	string x = s1;
+	for (int i = 1; i < 10; i++) {
+		mult_table.push_back(x);
+		x = add_string(x, s1);
 	}
-	std::cout << out.size() << std::endl;
-	return 0;
+	vector<string> temp;
+	string s2_reverse;
+	s2_reverse.assign(s2);
+	std::reverse(s2_reverse.begin(), s2_reverse.end());
+	for (int i = 0; i < s2_reverse.size(); i++) {
+		temp.push_back(multiply_ten(mult_table[s2_reverse[i]-'0'],i));
+	}
+	string out = "0";
+	for (string i: temp) {
+		out = add_string(out, i);
+	}
+	return out;
+}
+int main() {
+	string out = "2";
+	for (int i = 1; i < 1000; i++) {
+		out = multiply_string(out, "2");
+	}
+	int total = 0;
+	for (char i: out) {
+		total += i - '0';
+	}
+	std::cout << total << std::endl;
 }
