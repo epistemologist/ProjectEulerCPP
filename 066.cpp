@@ -2,7 +2,9 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
+using namespace std;
 // From GeeksforGeeks
 string add_string(string s1, string s2) {
 	if (s1.length() > s2.length()) {
@@ -93,3 +95,43 @@ std::ostream& operator<<(ostream& out, const BigInt& num) {
 	return out;
 }
 
+
+BigInt gen_solutions(int S) {
+	unsigned int m = 0;
+	unsigned int d = 1;
+	unsigned int a0 = (unsigned int) sqrt(S);
+	BigInt s_big(to_string(S));
+	BigInt one("1");
+	if (a0*a0 == S) return BigInt("0");
+	unsigned int a = a0;
+	vector<BigInt> numerators = {BigInt("0"), BigInt("1")};
+	vector<BigInt> denominators = {BigInt("1"), BigInt("0")};
+	for (int i = 0; ; i++) {
+		BigInt new_num = BigInt(to_string(a))*numerators[i+1]+numerators[i];
+		BigInt new_den = BigInt(to_string(a))*denominators[i+1]+denominators[i];
+		numerators.push_back(new_num);
+		denominators.push_back(new_den);
+		/*
+		We need to check if 
+		 new_num*new_num - new_den*new_den*s_big = 1
+		=> new_num*new_num = 1+new_den*new_den*s_big 
+		*/
+		if (new_num*new_num == one+new_den*new_den*s_big) return new_num;
+		m = d*a-m;
+		d = (S-m*m)/d;
+		a = (a0+m)/d;
+	}
+}
+
+int main() {
+	int out = 0;
+	BigInt max_x("0");
+	for (int i = 0; i <= 1000; i++) {
+		BigInt x_sol = gen_solutions(i);
+		if (max_x < x_sol) {
+			max_x = x_sol;
+			out = i;
+		}
+	}
+	std::cout << out << std::endl;
+}

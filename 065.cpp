@@ -78,9 +78,6 @@ vector<string> gen_numbers(int length, vector<string> initial_nums) {
 	return out;
 }
 
-
-
-
 int main() {
 	vector<string> numerators = gen_numbers(102, {"1","1","2"});
 	int out = 0;
